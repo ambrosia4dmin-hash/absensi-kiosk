@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Absensi Karyawan</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f5f9;
+  color: #222;
+}
+
+.header {
+  background: #1565c0;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.header p {
+  margin: 7px 0 0;
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 20px;
+}
+
+.camera-card {
+  background: white;
+  padding: 12px;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.12);
+}
+
+video {
+  width: 100%;
+  display: block;
+  background: #111;
+  border-radius: 14px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.status {
+  margin-top: 15px;
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background: #1565c0;
+}
+
+.stop {
+  background: #d32f2f;
+}
+
+.success {
+  color: #1b5e20;
+}
+
+.error {
+  color: #b71c1c;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="header">
+
+<h2>📷 ABSENSI KARYAWAN</h2>
+
+<p>Face Recognition Kiosk</p>
+
+</div>
+
+
+<div class="container">
+
+
+<div class="camera-card">
+
+<video
+id="video"
+autoplay
+muted
+playsinline>
+</video>
+
+</div>
+
+
+<div
+id="status"
+class="status">
+
+Kamera belum aktif
+
+</div>
+
+
+<button
+onclick="startCamera()">
+
+📷 MULAI KAMERA
+
+</button>
+
+
+<button
+class="stop"
+onclick="stopCamera()">
+
+⛔ MATIKAN KAMERA
+
+</button>
+
+
+</div>
+
+
+<script>
+
+let stream = null;
+
+const video =
+document.getElementById("video");
+
+const status =
+document.getElementById("status");
+
+
+async function startCamera() {
+
+  try {
+
+    status.innerHTML =
+      "⏳ Meminta akses kamera...";
+
+
+    if (!navigator.mediaDevices) {
+
+      throw new Error(
+        "Browser tidak mendukung kamera."
+      );
+
+    }
+
+
+    stream =
+      await navigator.mediaDevices
+      .getUserMedia({
+
+        video: true,
+
+        audio: false
+
+      });
+
+
+    video.srcObject =
+      stream;
+
+
+    await video.play();
+
+
+    status.innerHTML =
+      `
+      <div class="success">
+
+      <b>✅ KAMERA AKTIF</b>
+
+      <br><br>
+
+      Kamera berhasil digunakan.
+
+      <br>
+
+      Tahap berikutnya adalah
+      Face Recognition.
+
+      </div>
+      `;
+
+  }
+
+  catch(error) {
+
+    console.error(error);
+
+
+    status.innerHTML =
+      `
+      <div class="error">
+
+      <b>❌ KAMERA GAGAL</b>
+
+      <br><br>
+
+      ${error.name}
+
+      <br>
+
+      ${error.message}
+
+      </div>
+      `;
+
+  }
+
+}
+
+
+function stopCamera() {
+
+  if (stream) {
+
+    stream
+      .getTracks()
+      .forEach(function(track) {
+
+        track.stop();
+
+      });
+
+    stream = null;
+
+  }
+
+
+  video.srcObject = null;
+
+
+  status.innerHTML =
+    "⛔ Kamera dimatikan.";
+
+}
+
+</script>
+
+
+</body>
+
+</html>
